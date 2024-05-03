@@ -1,0 +1,47 @@
+.calender_wrapper {
+  width: 350px;
+  height: 240px;
+  font-size: 16px;
+}
+.month_wrapper {
+  height: 44px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.month_previous,
+.month_next {
+  width: 44px;
+  height: 44px;
+  line-height: 44px;
+  text-align: center;
+  background-color: white;
+}
+.month_previous:hover,
+.month_next:hover {
+  background-color: #e6e6e6;
+  cursor: pointer;
+}
+
+.day {
+  width: 50px;
+  height: 36px;
+  text-align: center;
+}
+
+.day:hover {
+  background-color: #e6e6e6;
+  cursor: pointer;
+}
+.day.today {
+  background-color: #ffff76;
+}
+.day.active {
+  background-color: #006edc;
+}
+.day.non-current {
+  background-color: #757575;
+  cursor: not-allowed;
+}
