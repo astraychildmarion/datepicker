@@ -20,10 +20,6 @@ function App() {
 		setDisplayMonth(nextMonth);
 	}, [selectedMonth]);
 
-	useEffect(() => {
-		console.log('start', start, 'end', end);
-	}, [start, end]);
-
 	const handleChangeMonth = (change) => {
 		setSelectedMonth((prev) => {
 			const [newMonth, newYear] = getNextOrPrevMonth(
@@ -95,7 +91,7 @@ function App() {
 
 			cells.push(
 				<td
-					className={`day ${isToday ? 'today' : 'hahah'}`}
+					className={`day ${isToday ? 'today' : ''}`}
 					data-date={date}
 					onClick={(event) => handleClickDay(event, date)}
 				>
