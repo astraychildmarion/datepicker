@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import './App.css';
+import { getMonthInfo, getNextOrPrevMonth } from './utils';
 
 const thisYear = new Date().getFullYear();
 const thisMonth = new Date().getMonth();
@@ -25,17 +26,11 @@ function App() {
 
 	const handleChangeMonth = (change) => {
 		setSelectedMonth((prev) => {
-			let newMonth = prev + change;
-			let newYear = selectedYear;
-
-			if (newMonth >= 12) {
-				newYear += 1;
-				newMonth = 0;
-			} else if (newMonth < 0) {
-				newYear -= 1;
-				newMonth = 11;
-			}
-
+			const [newMonth, newYear] = getNextOrPrevMonth(
+				selectedYear,
+				prev,
+				change
+			);
 			setSelectedYear(newYear);
 			return newMonth;
 		});
@@ -73,19 +68,6 @@ function App() {
 			}
 		}
 	};
-
-	function getMonthInfo(year, month) {
-		const firstDayInMonth = new Date(year, month);
-		const lastDayOfLastMonth = new Date(firstDayInMonth - 1);
-		const lastDayOfMonth = new Date(year, month + 1, 0);
-
-		return {
-			firstDayInMonth: firstDayInMonth,
-			lastDayOfLastMonth: lastDayOfLastMonth,
-			lastDayOfWeekLastMonth: lastDayOfLastMonth.getDay(),
-			lastDayOfMonth: lastDayOfMonth,
-		};
-	}
 
 	const renderCalendarDays = (year, month) => {
 		const day = new Date(year, month);
