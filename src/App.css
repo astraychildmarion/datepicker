@@ -1,28 +1,34 @@
-.calender_wrapper {
+.calender-wrapper {
   width: 350px;
   height: 240px;
   font-size: 16px;
+  margin: 0 auto;
 }
-.month_wrapper {
+.day-wrapper {
+  height: 240px;
+}
+.month-controls {
   height: 44px;
   margin-bottom: 16px;
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
 }
 
-.month_previous,
-.month_next {
+.month-control {
   width: 44px;
   height: 44px;
   line-height: 44px;
   text-align: center;
   background-color: white;
+  border: none;
 }
-.month_previous:hover,
-.month_next:hover {
+.month-control:hover {
   background-color: #e6e6e6;
   cursor: pointer;
+}
+.month-control:disabled {
+  cursor: not-allowed;
 }
 
 .day {
@@ -38,10 +44,21 @@
 .day.today {
   background-color: #ffff76;
 }
+.day.today.active {
+  background-color: #ffff76;
+}
 .day.active {
   background-color: #006edc;
 }
 .day.non-current {
-  background-color: #757575;
+  color: #757575;
   cursor: not-allowed;
+}
+.day.non-current:hover {
+  background-color: #ffffff;
+  cursor: not-allowed;
+}
+
+.App {
+  width: 100vw;
 }

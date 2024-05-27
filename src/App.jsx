@@ -1,101 +1,116 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './App.css';
+import { getMonthInfo, getNextOrPrevMonth } from './utils';
 
 const thisYear = new Date().getFullYear();
-const thisMonth = new Date().getMonth() + 1;
-const DAYS = ['Mon', 'Tues', 'Weds', 'Thurs', 'Fri', 'Sat', 'Sun'];
-const WEEK_DAY = 7;
+const thisMonth = new Date().getMonth();
+const DAYS = ['Sun', 'Mon', 'Tues', 'Weds', 'Thurs', 'Fri', 'Sat'];
+const DAYS_IN_WEEK = 7;
+const SATURDAY = 6;
 
 function App() {
 	const [selectedMonth, setSelectedMonth] = useState(thisMonth);
+	const [displayMonth, setDisplayMonth] = useState('');
 	const [selectedYear, setSelectedYear] = useState(thisYear);
-	const [selectedDate, setSelectedDate] = useState('');
+	const [start, setStart] = useState('');
+	const [end, setEnd] = useState('');
 
-	const handleChangeMonth = (num) => {
+	useEffect(() => {
+		let nextMonth = selectedMonth + 1;
+		setDisplayMonth(nextMonth);
+	}, [selectedMonth]);
+
+	const handleChangeMonth = (change) => {
 		setSelectedMonth((prev) => {
-			let newMonth = prev + num;
-			let newYear = selectedYear;
-
-			if (newMonth > 12) {
-				newYear += 1;
-				newMonth = 1;
-			} else if (newMonth < 1) {
-				newYear -= 1;
-				newMonth = 12;
-			}
-
+			const [newMonth, newYear] = getNextOrPrevMonth(
+				selectedYear,
+				prev,
+				change
+			);
 			setSelectedYear(newYear);
 			return newMonth;
 		});
 	};
-	const setMondayFirst = (day) => {
-		if (day === 0) day = 7;
-		return day - 1;
+	const handleClickDay = (event, date) => {
+		event.preventDefault();
+		if (start === '') {
+			setStart(date);
+			event.target.classList.add('active');
+		} else {
+			if (date > start) {
+				setEnd(date);
+				event.target.classList.add('active');
+				const days = document.querySelectorAll('.day');
+				days.forEach((day) => {
+					const dayDate = parseInt(day.dataset.date);
+					if (dayDate >= start && dayDate <= date) {
+						day.classList.add('active');
+					} else {
+						day.classList.remove('active');
+					}
+				});
+			} else {
+				setStart(date);
+				event.target.classList.add('active');
+				const days = document.querySelectorAll('.day');
+				days.forEach((day) => {
+					const dayDate = parseInt(day.dataset.date);
+					if (dayDate >= date && dayDate <= end) {
+						day.classList.add('active');
+					} else {
+						day.classList.remove('active');
+					}
+				});
+			}
+		}
 	};
-	const handleDay = (date) => {
-		console.log('click date', date);
-	};
 
-	function getMonthInfo(year, month) {
-		const nextMonthFirstDay = new Date(year, month + 1, 1);
-		const lastDayOfMonth = new Date(nextMonthFirstDay - 1);
-		const dayOfWeek = lastDayOfMonth.getDay();
-
-		const firstDateOfMonth = nextMonthFirstDay.getDate();
-		const firstDayOfWeek = nextMonthFirstDay.getDay();
-
-		const lastDayOfPreviousMonth = new Date(year, month, 0);
-		const daysInLastMonth = lastDayOfPreviousMonth.getDate();
-		const dateLastMonth = lastDayOfPreviousMonth.getDay();
-
-		return {
-			lastDayOfMonth: lastDayOfMonth.getDate(),
-			dayOfWeek: dayOfWeek,
-			firstDateOfMonth: firstDateOfMonth,
-			firstDayOfWeek: firstDayOfWeek,
-			daysInLastMonth: daysInLastMonth,
-			dateLastMonth: dateLastMonth,
-		};
-	}
-
-	const createDays = (year, month) => {
-		const day = new Date(year, month - 1);
-		let dayCells = [];
+	const renderCalendarDays = (year, month) => {
+		const day = new Date(year, month);
+		const today = new Date();
+		let cells = [];
 		const weekRow = [];
-		const { lastDayOfMonth, dayOfWeek, daysInLastMonth } = getMonthInfo(
+
+		const { lastDayOfLastMonth, lastDayOfMonth } = getMonthInfo(
 			year,
-			month - 1
+			month
 		);
-		const adjustedDay = setMondayFirst(day.getDay());
-		for (let n = 0; n < adjustedDay; n++) {
-			dayCells.push(
+
+		const startEmptyDays = day.getDay();
+		for (let n = 0; n < startEmptyDays; n++) {
+			cells.push(
 				<td className="day non-current">
-					{daysInLastMonth - adjustedDay + n + 1}
+					{lastDayOfLastMonth.getDate() - startEmptyDays + n + 1}
 				</td>
 			);
 		}
 
-		while (day.getMonth() === month - 1) {
+		while (day.getMonth() === month) {
 			const date = day.getDate();
+			const isToday = day.toDateString() === today.toDateString();
 
-			dayCells.push(
-				<td className="day" onClick={() => handleDay(date)}>
+			cells.push(
+				<td
+					className={`day ${isToday ? 'today' : ''}`}
+					data-date={date}
+					onClick={(event) => handleClickDay(event, date)}
+				>
 					{date}
 				</td>
 			);
-			if (date === lastDayOfMonth && dayOfWeek !== 0) {
-				const emptyCells = WEEK_DAY - dayOfWeek;
-				for (let n = 1; n <= emptyCells; n++) {
-					dayCells.push(<td className="day non-current">{n}</td>);
+
+			if (date === lastDayOfMonth.getDate()) {
+				const emptyCells = DAYS_IN_WEEK - lastDayOfMonth.getDay();
+				for (let n = 1; n < emptyCells; n++) {
+					cells.push(<td className="day non-current">{n}</td>);
 				}
 			}
-
 			if (
-				setMondayFirst(day.getDay()) % 7 === 6 ||
-				date === new Date(year, month, 0).getDate()
+				day.getDay() % DAYS_IN_WEEK === SATURDAY ||
+				date === lastDayOfMonth.getDate()
 			) {
-				weekRow.push(<tr>{dayCells}</tr>);
-				dayCells = [];
+				weekRow.push(<tr>{cells}</tr>);
+				cells = [];
 			}
 			day.setDate(date + 1);
 		}
@@ -116,26 +131,28 @@ function App() {
 
 	return (
 		<div className="App">
-			<div className="calender_wrapper">
-				<div className="month_wrapper">
-					<div
-						className="month_previous"
+			<div className="calender-wrapper">
+				<div className="month-controls">
+					<button
+						className="month-control"
 						onClick={() => handleChangeMonth(-1)}
+						disabled
 					>
 						&lt;
+					</button>
+					<div className="month-title">
+						{selectedYear} 年 {displayMonth} 月
 					</div>
-					<div className="month_current">
-						{selectedYear} 年 {selectedMonth} 月
-					</div>
-					<div
-						className="month_next"
+					<button
+						className="month-control"
 						onClick={() => handleChangeMonth(1)}
+						disabled
 					>
 						&gt;
-					</div>
+					</button>
 				</div>
-				<div className="day_wrapper">
-					{createDays(selectedYear, selectedMonth)}
+				<div className="day-wrapper">
+					{renderCalendarDays(selectedYear, selectedMonth)}
 				</div>
 			</div>
 		</div>
