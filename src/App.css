@@ -21,10 +21,14 @@
   line-height: 44px;
   text-align: center;
   background-color: white;
+  border: none;
 }
 .month-control:hover {
   background-color: #e6e6e6;
   cursor: pointer;
+}
+.month-control:disabled {
+  cursor: not-allowed;
 }
 
 .day {

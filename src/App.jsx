@@ -133,21 +133,23 @@ function App() {
 		<div className="App">
 			<div className="calender-wrapper">
 				<div className="month-controls">
-					<div
+					<button
 						className="month-control"
 						onClick={() => handleChangeMonth(-1)}
+						disabled
 					>
 						&lt;
-					</div>
+					</button>
 					<div className="month-title">
 						{selectedYear} 年 {displayMonth} 月
 					</div>
-					<div
+					<button
 						className="month-control"
 						onClick={() => handleChangeMonth(1)}
+						disabled
 					>
 						&gt;
-					</div>
+					</button>
 				</div>
 				<div className="day-wrapper">
 					{renderCalendarDays(selectedYear, selectedMonth)}
